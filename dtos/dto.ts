@@ -16,16 +16,16 @@ export interface PersonInfo {
     email: string;
     name: string;
     entityId: string;
+    role: 'master' | 'partner';
+    masterId?: string;
   }
   
   export interface MasterUserRegistrationDTO extends BaseRegistrationDTO {
     role: 'master';
-    entityId: string;
   }
   
   export interface PartnerUserRegistrationDTO extends BaseRegistrationDTO {
     role: 'partner';
-    entityId: string;
     masterId: string;
   }
   

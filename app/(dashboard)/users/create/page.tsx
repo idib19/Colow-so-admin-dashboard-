@@ -1,24 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from 'sonner';
+import { createMasterUser } from '@/lib/users';
 
 interface BaseRegistrationDTO {
   password: string;
   email: string;
   name: string;
   entityId: string;
-  role: 'Master' | 'Partner';
+  role: 'master';
 }
 
 export default function CreateUserPage() {
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState<'Master' | 'Partner'>('Partner');
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,13 +30,27 @@ export default function CreateUserPage() {
       email: formData.get('email') as string,
       name: formData.get('name') as string,
       entityId: formData.get('entityId') as string,
-      role,
+      role: 'master',
     };
 
     try {
-      // TODO: Implement API call
-      console.log('Form data:', data);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Authentication token not found');
+        return;
+      }
+
+      await createMasterUser(data, token);
       toast.success('User created successfully');
+
+      // Clear the form fields
+      if (formRef.current) {
+        formRef.current.reset();
+      }
+
+      // Add a delay for user experience
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
     } catch (error) {
       toast.error('Failed to create user');
     } finally {
@@ -55,7 +69,7 @@ export default function CreateUserPage() {
           <CardTitle>User Registration</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -78,15 +92,12 @@ export default function CreateUserPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="role">Role</Label>
-                <Select value={role} onValueChange={(value: 'Master' | 'Partner') => setRole(value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Master">Master</SelectItem>
-                    <SelectItem value="Partner">Partner</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input 
+                  id="role" 
+                  value="Master"
+                  disabled
+                  className="bg-muted"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="entityId">Entity ID</Label>
