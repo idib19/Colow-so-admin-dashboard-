@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-
+import { createMaster } from '@/lib/master';
 interface MasterRegistrationDTO {
   country: string;
 }
@@ -15,6 +15,11 @@ export default function CreateMasterPage() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error('Authentication token not found');
+      return;
+    }
     e.preventDefault();
     setLoading(true);
 
@@ -25,8 +30,10 @@ export default function CreateMasterPage() {
 
     try {
       // TODO: Implement API call
-      console.log('Form data:', data);
-      toast.success('Master created successfully');
+      const response = await createMaster(data, token );
+      console.log("try to post with data", data);
+      console.log('Master created successfully:', response);
+      toast.success('Master created successfully in ' + response.country);
     } catch (error) {
       toast.error('Failed to create master');
     } finally {

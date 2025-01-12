@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { LoginResponse } from '@/lib/auth';
 
 interface AuthContextType {
@@ -20,24 +20,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<LoginResponse['user'] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const validateToken = () => {
+    try {
+      const token = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+
+      if (!token || !storedUser) {
+        throw new Error('No token or user found');
+      }
+
+      // TODO: Add token expiration check here when implementing JWT
+      // For now, we'll just check if the token exists
+
+      setUser(JSON.parse(storedUser));
+      return true;
+    } catch (error) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+      return false;
+    }
+  };
 
   useEffect(() => {
-    // DEVELOPMENT: Always set isLoading to false since we're not doing real auth checks
-    // TODO: Implement proper token validation for production
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
-    }
+    const isValid = validateToken();
     setIsLoading(false);
-  }, []);
+
+    if (!isValid && pathname !== '/login') {
+      window.location.href = '/login';
+    }
+  }, [pathname]);
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
-    router.push('/login');
+    window.location.href = '/login';
   };
 
   return (

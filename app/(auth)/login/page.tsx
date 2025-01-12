@@ -30,7 +30,9 @@ export default function LoginPage() {
       localStorage.setItem('user', JSON.stringify(response.user));
       
       toast.success(`Welcome back, ${response.user.name}`);
-      router.push('/dashboard');
+      
+      // Force a hard navigation to the dashboard
+      window.location.href = '/dashboard';
     } catch (error) {
       toast.error('Invalid credentials');
     } finally {

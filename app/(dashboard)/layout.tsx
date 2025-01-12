@@ -16,26 +16,25 @@ export default function DashboardLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    // DEVELOPMENT: Comment out authentication check
-    // TODO: Uncomment for production
-    /*
     if (!isLoading && !user && pathname !== '/login') {
-      router.push('/login');
+      window.location.href = '/login';
     }
-    */
-  }, [user, isLoading, router, pathname]);
+  }, [user, isLoading, pathname]);
 
-  // DEVELOPMENT: Remove loading check
-  // TODO: Restore for production
-  /*
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-2 text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
     return null;
   }
-  */
 
   return (
     <div className="min-h-screen bg-background">

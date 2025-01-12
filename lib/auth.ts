@@ -31,6 +31,7 @@ const TEST_CREDENTIALS = {
 export async function login(username: string, password: string): Promise<LoginResponse> {
   // DEVELOPMENT: Use hardcoded credentials check
   // TODO: Remove this condition and use only the API call for production
+  /*
   if (process.env.NODE_ENV === 'development') {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -43,11 +44,11 @@ export async function login(username: string, password: string): Promise<LoginRe
     }
     throw new Error('Invalid credentials');
   }
-
+*/
   // PRODUCTION: Real API call
   // Uncomment and use this code for production
-  /*
-  const response = await fetch('https://api.example.com/api/auth/login', {
+
+  const response = await fetch('http://localhost:3000/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
@@ -58,5 +59,5 @@ export async function login(username: string, password: string): Promise<LoginRe
   }
 
   return response.json();
-  */
+
 }
