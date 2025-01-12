@@ -1,22 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { transferUnits } from '@/lib/master';
-
+import { transferUnits, getMasters } from '@/lib/master';
 
 interface LoadUnitsDTO {
   receiverId: string;
   amount: number;
 }
 
+interface Master {
+  _id: string;
+  country: string;
+  balance: number;
+  partnersList: string[];
+  assignedUserId?: string;
+  totalCommission: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function LoadUnitsPage() {
   const [loading, setLoading] = useState(false);
+  const [masters, setMasters] = useState<Master[]>([]);
+
+  useEffect(() => {
+    const fetchMasters = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          toast.error('Authentication token not found');
+          return;
+        }
+        
+        const response = await getMasters(token);
+        setMasters(response);
+      } catch (error) {
+        toast.error('Failed to fetch masters');
+      }
+    };
+
+    fetchMasters();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,22 +59,17 @@ export default function LoadUnitsPage() {
     };
 
     try {
-
       const token = localStorage.getItem('token');
       if (!token) {
         toast.error('Authentication token not found');
         return;
       }
       
-      const response = await transferUnits(data, token);
-      
-      if (response.status === 200) {
-        toast.success('Units loaded successfully');
-      } else {
-        toast.error('Failed to load units');
-      }
+      await transferUnits(data, token);
+      toast.success('Units loaded successfully');
 
     } catch (error) {
+      console.error('Error loading units:', error);
       toast.error('Failed to load units');
     } finally {
       setLoading(false);
@@ -94,6 +118,46 @@ export default function LoadUnitsPage() {
               </Button>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Masters List</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border">
+            <table className="min-w-full divide-y divide-gray-200 bg-gray-50">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Master ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Country
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Balance
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {masters.map((master) => (
+                  <tr key={master._id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {master._id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {master.country}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {master.balance.toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>

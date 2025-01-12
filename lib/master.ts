@@ -71,5 +71,5 @@ export async function transferUnits(data: any, token: string): Promise<any> {
     throw new Error('Transfer units failed');
   }
 
-  return response.json();
+  return response;
 }
