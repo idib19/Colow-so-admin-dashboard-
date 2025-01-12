@@ -16,6 +16,7 @@ import {
 import { toast } from 'sonner';
 import { getMasters } from '@/lib/master';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 interface Master {
   _id: string;
@@ -37,6 +38,8 @@ export default function MastersListPage() {
     key: keyof Master;
     direction: 'asc' | 'desc';
   }>({ key: 'createdAt', direction: 'desc' });
+
+  useAuth();
 
   const fetchMasters = async () => {
     try {

@@ -2,7 +2,12 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { jwtDecode } from 'jwt-decode';
 import { LoginResponse } from '@/lib/auth';
+
+interface TokenPayload {
+  exp: number;
+}
 
 interface AuthContextType {
   user: LoginResponse['user'] | null;
@@ -16,6 +21,16 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
 });
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const { exp } = jwtDecode<TokenPayload>(token);
+    if (!exp) return true;
+    return Date.now() >= exp * 1000;
+  } catch (error) {
+    return true;
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<LoginResponse['user'] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,12 +42,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const token = localStorage.getItem('token');
       const storedUser = localStorage.getItem('user');
 
-      if (!token || !storedUser) {
-        throw new Error('No token or user found');
+      if (!token || !storedUser || isTokenExpired(token)) {
+        throw new Error('Invalid token or user');
       }
-
-      // TODO: Add token expiration check here when implementing JWT
-      // For now, we'll just check if the token exists
 
       setUser(JSON.parse(storedUser));
       return true;
@@ -49,15 +61,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
 
     if (!isValid && pathname !== '/login') {
-      window.location.href = '/login';
+      router.push('/login');
     }
-  }, [pathname]);
+  }, [pathname, router]);
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
-    window.location.href = '/login';
+    router.push('/login');
   };
 
   return (

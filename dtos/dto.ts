@@ -88,9 +88,10 @@ export interface PersonInfo {
   
   // Transfer DTOs
   export interface CreateTransferDTO {
-    type: 1 | 2;
     amount: number;
     issuerId: string;
+    receiverId: string;
+    type: 1 | 2;
   }
   
   export interface TransferResponseDTO {

@@ -6,11 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { transferUnits } from '@/lib/master';
+
 
 interface LoadUnitsDTO {
-  masterId: string;
+  receiverId: string;
   amount: number;
 }
+
 
 export default function LoadUnitsPage() {
   const [loading, setLoading] = useState(false);
@@ -20,15 +23,28 @@ export default function LoadUnitsPage() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
+
     const data: LoadUnitsDTO = {
-      masterId: formData.get('masterId') as string,
-      amount: Number(formData.get('amount')),
+      receiverId: formData.get('masterId') as string,
+      amount: Number(formData.get('amount'))
     };
 
     try {
-      // TODO: Implement API call
-      console.log('Form data:', data);
-      toast.success('Units loaded successfully');
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Authentication token not found');
+        return;
+      }
+      
+      const response = await transferUnits(data, token);
+      
+      if (response.status === 200) {
+        toast.success('Units loaded successfully');
+      } else {
+        toast.error('Failed to load units');
+      }
+
     } catch (error) {
       toast.error('Failed to load units');
     } finally {
