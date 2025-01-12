@@ -4,6 +4,8 @@ import { MasterResponseDTO } from '@/dtos/dto';
 import { CreateTransferDTO } from '@/dtos/dto';
 import { jwtDecode } from "jwt-decode";
 
+const API_URL = process.env.API_URL;
+
 interface TokenPayload {
   id: string;
   role: string;
@@ -18,7 +20,7 @@ function decodeToken(token: string): { id: string } {
 
 export async function createMaster(data: CreateMasterDTO, token: string): Promise<MasterResponseDTO> {
   // PRODUCTION: Real API call to create a master
-  const response = await fetch('http://localhost:3000/api/colowso/create-master', {
+  const response = await fetch(`${API_URL}/colowso/create-master`, {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',
@@ -35,7 +37,7 @@ export async function createMaster(data: CreateMasterDTO, token: string): Promis
 }
 
 export async function getMasters(token: string): Promise<any> {
-  const response = await fetch('http://localhost:3000/api/colowso/masters', {
+  const response = await fetch(`${API_URL}/colowso/masters`, {
     headers: { 'Authorization': `Bearer ${token}` },
   });
 
@@ -58,7 +60,7 @@ export async function transferUnits(data: any, token: string): Promise<any> {
     throw new Error('Invalid token');
   }
 
-  const response = await fetch('http://localhost:3000/api/colowso/load-master', {
+  const response = await fetch(`${API_URL}/colowso/load-master`, {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',

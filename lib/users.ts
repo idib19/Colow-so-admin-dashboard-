@@ -1,8 +1,9 @@
 import { MasterUserRegistrationDTO } from '@/dtos/dto';
 
+const API_URL = process.env.API_URL;
 
 export async function getAllUsers(token: string): Promise<any> {
-  const response = await fetch('http://localhost:3000/api/auth/users', {
+  const response = await fetch(`${API_URL}/auth/users`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
