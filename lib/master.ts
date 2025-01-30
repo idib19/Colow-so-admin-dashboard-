@@ -4,7 +4,7 @@ import { MasterResponseDTO } from '@/dtos/dto';
 import { CreateTransferDTO } from '@/dtos/dto';
 import { jwtDecode } from "jwt-decode";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface TokenPayload {
   id: string;

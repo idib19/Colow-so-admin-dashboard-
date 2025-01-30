@@ -28,6 +28,7 @@ const TEST_CREDENTIALS = {
   }
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export async function login(username: string, password: string): Promise<LoginResponse> {
   // DEVELOPMENT: Use hardcoded credentials check
   // TODO: Remove this condition and use only the API call for production
@@ -48,7 +49,7 @@ export async function login(username: string, password: string): Promise<LoginRe
   // PRODUCTION: Real API call
   // Uncomment and use this code for production
 
-  const response = await fetch('http://localhost:3000/api/auth/login', {
+  const response = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
